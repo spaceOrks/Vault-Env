@@ -1,0 +1,158 @@
+{
+  "name": "vault-env",
+  "displayName": "vault-env",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.103.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vaultEnv.env.edit",
+        "title": "Edir",
+        "icon": "$(edit)"
+      },
+      {
+        "command": "vaultEnv.configs.addPath",
+        "title": "add path in Vault",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vaultEnv.servers.addServer",
+        "title": "Add server",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vaultEnv.servers.removeServer",
+        "title": "Remove server",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "vaultEnv.servers.changeName",
+        "title": "Изменить название",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vaultEnv.servers.changeUrl",
+        "title": "Change server's url",
+        "icon": "$(server)"
+      },
+      {
+        "command": "vaultEnv.servers.changeToken",
+        "title": "Change token",
+        "icon": "$(gist-secret)"
+      },
+      {
+        "command": "vaultEnv.configs.removePath",
+        "title": "Удалить путь",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "vaultEnv.configs.loadSecret",
+        "title": "launch Vault Env ext"
+      },
+      {
+        "command": "vaultEnv.servers.listConfigs",
+        "title": "List allowed configs"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "vaultSecrets",
+          "title": "Vault Secrets",
+          "icon": "resources/safe.svg"
+        }
+      ]
+    },
+    "views": {
+      "vaultSecrets": [
+        {
+          "id": "vaultParamsView",
+          "name": "Servers"
+        },
+        {
+          "id": "vaultSecretsView",
+          "name": "Configs"
+        },
+        {
+          "id": "vaultCurrentEnvView",
+          "name": "Current Env"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "vaultEnv.configs.addPath",
+          "when": "view == vaultSecretsView",
+          "group": "navigation"
+        },
+        {
+          "command": "vaultEnv.servers.addServer",
+          "when": "view == vaultParamsView",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "vaultEnv.configs.removePath",
+          "when": "viewItem == 'VaultItem'",
+          "group": "inline"
+        },
+        {
+          "command": "vaultEnv.servers.removeServer",
+          "when": "viewItem == 'ParamItem'",
+          "group": "inline"
+        },
+        {
+          "command": "vaultEnv.servers.changeUrl",
+          "when": "viewItem == 'ParamItem'",
+          "group": "inline"
+        },
+        {
+          "command": "vaultEnv.servers.changeName",
+          "when": "viewItem == 'ParamItem'",
+          "group": "inline"
+        },
+        {
+          "command": "vaultEnv.servers.changeToken",
+          "when": "viewItem == 'ParamItem'",
+          "group": "inline"
+        },
+        {
+          "command": "vaultEnv.env.edit",
+          "when": "viewItem == 'vaultEnvItem'",
+          "group": "inline"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.55.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
+    "eslint": "^9.32.0",
+    "typescript": "^5.9.2",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "@types/node-fetch": "^2.6.13",
+    "node-fetch": "^2.7.0"
+  }
+}
