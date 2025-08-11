@@ -1,8 +1,4 @@
-import { log } from 'console';
 import * as vscode from 'vscode';
-import fetch, { RequestInit } from 'node-fetch';
-import * as https from 'https';
-import * as crypto from 'crypto';
 
 import { VaultAPI } from './api/vault_api';
 
@@ -18,7 +14,7 @@ export class ConfigItem extends vscode.TreeItem {
   ) {
     super(label, collapsibleState);
     this.command = {
-      command: 'vaultEnv.configs.loadSecret',
+      command: 'vault-env.configs.loadSecret',
       title: 'Load Secret',
       arguments: [this]
     };

@@ -1,4 +1,3 @@
-import { log } from 'console';
 import * as vscode from 'vscode';
 
 import { VaultAPI } from './api/vault_api';
@@ -17,8 +16,8 @@ export class EnvItem extends vscode.TreeItem {
   ) {
     super(`${key}: ${value}`, collapsibleState);
     this.command = {
-      command: 'vaultEnv.env.copyEnv',
-      title: 'vaultEnv.env.copyEnv',
+      command: 'vault-env.env.copyEnv',
+      title: 'vault-env.env.copyEnv',
       arguments: [this.value]
     };
     this.contextValue = 'vaultEnvItem';

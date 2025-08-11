@@ -1,8 +1,4 @@
-import { log } from 'console';
 import * as vscode from 'vscode';
-import fetch, { RequestInit } from 'node-fetch';
-import * as https from 'https';
-import * as crypto from 'crypto';
 
 const currentSecretsKey = 'currentSecrets';
 const VAULT_SERVERS_KEY = 'vaultServers';
@@ -18,31 +14,31 @@ export class ParamLeafItem extends vscode.TreeItem {
     super(`${type}: ${name}`, vscode.TreeItemCollapsibleState.None);
     if (type === 'url') {
         this.command = {
-        command: 'vaultEnv.servers.changeUrl',
+        command: 'vault-env.servers.changeUrl',
         title: "Change server's url",
         arguments: [server_name]
         };
     } else if (type === 'token') {
         this.command = {
-        command: 'vaultEnv.servers.changeToken',
+        command: 'vault-env.servers.changeToken',
         title: "Change server's token",
         arguments: [server_name]
         };
     } else if (type === 'ignoreSsl') {
         this.command = {
-        command: 'vaultEnv.servers.changeIgnoreSsl',
+        command: 'vault-env.servers.changeIgnoreSsl',
         title: "Change server's ignoreSsl",     
         arguments: [server_name]
         };
     } else if (type === 'name') {
         this.command = {
-        command: 'vaultEnv.servers.changeName',
+        command: 'vault-env.servers.changeName',
         title: "Change server's name",
         arguments: [server_name]
         };
     } else if (type === 'storage') {
         this.command = {
-        command: 'vaultEnv.servers.changeStorage',
+        command: 'vault-env.servers.changeStorage',
         title: "Change vault's storage",
         arguments: [server_name]
         };
@@ -61,7 +57,7 @@ export class ParamItem extends vscode.TreeItem {
   ) {
     super(name + ` (${url})`, vscode.TreeItemCollapsibleState.Collapsed);
     this.command = {
-      command: 'vaultEnv.servers.listConfigs',
+      command: 'vault-env.servers.listConfigs',
       title: 'List allowed configs',
       arguments: [this]
     };

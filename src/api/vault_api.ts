@@ -1,6 +1,5 @@
 import { log } from 'console';
 import * as vscode from 'vscode';
-import fetch, { RequestInit } from 'node-fetch';
 import * as https from 'https';
 import * as crypto from 'crypto';
 
@@ -12,7 +11,7 @@ export class VaultAPI{
         public readonly ignoreSsl: boolean
     ) {
     }
-  
+    
     async getRequest(method: 'GET' | 'LIST', endpoint: string): Promise<{[key: string]: unknown} | null> {
         const fullUrl = `${this.url}${endpoint}`;
         const agent = new https.Agent({
@@ -21,21 +20,22 @@ export class VaultAPI{
             secureProtocol: 'TLSv1_2_method'
         });
 
-        const options: RequestInit = {
+        const options = {
             method: method,
             headers: {
                 'X-Vault-Token': this.token
             },
-            agent: agent as any
+            agent: agent
         };
                 
         let data = {};
         try {
+            const { default: fetch } = await import('node-fetch');
             const response = await fetch(fullUrl, options);
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status} - ${response.statusText} - ${response.body.read()}`);
+                throw new Error(`HTTP ${response.status} - ${response.statusText} - ${response.body?.read()}`);
             }
-            data = await response.json();
+            data = await response.json() as {};
             return data;
         } catch (err) {
             vscode.window.showErrorMessage(`error: ${err}`);

@@ -1,8 +1,4 @@
-import { log } from 'console';
 import * as vscode from 'vscode';
-import fetch, { RequestInit } from 'node-fetch';
-import * as https from 'https';
-import * as crypto from 'crypto';
 
 
 import {ParamsProvider, ParamItem} from './ParamsProvider';
@@ -22,9 +18,9 @@ export function activate(context: vscode.ExtensionContext) {
     
     context.subscriptions.push(
         
-        // -------------------------------- vaultEnv.servers ---------------------------
+        // -------------------------------- vault-env.servers ---------------------------
         
-        vscode.commands.registerCommand('vaultEnv.servers.listConfigs', async (item: ParamItem) => {
+        vscode.commands.registerCommand('vault-env.servers.listConfigs', async (item: ParamItem) => {
             
             configProvider.setSelected(item.name);
             const config = await configProvider.getConfig();
@@ -43,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
             // }
             // currentEvnProvider.refresh();
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.addServer', async () => {
+        vscode.commands.registerCommand('vault-env.servers.addServer', async () => {
             const name = await vscode.window.showInputBox({
                 placeHolder: 'Введите уникальное название для сохранения конфиги'
             });
@@ -65,7 +61,7 @@ export function activate(context: vscode.ExtensionContext) {
                 
             }
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.removeServer', async (item: ParamItem) => {
+        vscode.commands.registerCommand('vault-env.servers.removeServer', async (item: ParamItem) => {
             if (!item) {return;}
 
             const confirm = await vscode.window.showWarningMessage(
@@ -77,25 +73,25 @@ export function activate(context: vscode.ExtensionContext) {
                 await configProvider.removeServer(item.name);
             }
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeUrl', async (server_name: string) => {
+        vscode.commands.registerCommand('vault-env.servers.changeUrl', async (server_name: string) => {
             await configProvider.saveNewUrl(server_name);
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeName', async (server_name: string) => {
+        vscode.commands.registerCommand('vault-env.servers.changeName', async (server_name: string) => {
             await configProvider.saveNewName(server_name);
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeStorage', async (server_name: string) => {
+        vscode.commands.registerCommand('vault-env.servers.changeStorage', async (server_name: string) => {
             await configProvider.saveNewStorage(server_name);
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeToken', async (server_name: string) => {
+        vscode.commands.registerCommand('vault-env.servers.changeToken', async (server_name: string) => {
             await configProvider.saveNewPassword(server_name);
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeIgnoreSsl', async (server_name: string) => {
+        vscode.commands.registerCommand('vault-env.servers.changeIgnoreSsl', async (server_name: string) => {
             await configProvider.saveNewSsl(server_name);
         }),
         
-        // -------------------------------- vaultEnv.configs ---------------------------
+        // -------------------------------- vault-env.configs ---------------------------
         
-        vscode.commands.registerCommand('vaultEnv.configs.loadSecret', async (item: ConfigItem) => {
+        vscode.commands.registerCommand('vault-env.configs.loadSecret', async (item: ConfigItem) => {
             vscode.window.showInformationMessage(`Loading secret at: ${item.label}`);
             let config: {url: string, token: string, ignoreSsl: boolean};
             try {
@@ -111,37 +107,15 @@ export function activate(context: vscode.ExtensionContext) {
             }
             currentEvnProvider.refresh();
         }),
-        vscode.commands.registerCommand('vaultEnv.configs.removePath', async (item: ConfigItem) => {
-            if (!item) {return;}
-
-            const confirm = await vscode.window.showWarningMessage(
-                `Удалить путь: ${item.label}?`,
-                { modal: true },
-                'Удалить'
-            );
-
-            if (confirm === 'Удалить') {
-            await provider.removePath(item.path);
-            }
-        }),
-        vscode.commands.registerCommand('vaultEnv.configs.addPath', async () => {
-            const path = await vscode.window.showInputBox({
-                placeHolder: 'Введите путь Vault (например: secret/data/app/db)'
-            });
-
-            if (path) {
-                await provider.addPath(path);
-            }
-        }),
         
-        // -------------------------------- vaultEnv.env ---------------------------
+        // -------------------------------- vault-env.env ---------------------------
             
-        vscode.commands.registerCommand('vaultEnv.env.edit', async (item: EnvItem) => {
+        vscode.commands.registerCommand('vault-env.env.edit', async (item: EnvItem) => {
             console.log("item:", item);
             console.log("item.key:", item.key);
             currentEvnProvider.changeEnv(item.key);
         }),
-        vscode.commands.registerCommand('vaultEnv.env.copyEnv', async (text: string) => {
+        vscode.commands.registerCommand('vault-env.env.copyEnv', async (text: string) => {
             await vscode.env.clipboard.writeText(text);
         })
     );

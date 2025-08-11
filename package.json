@@ -2,73 +2,76 @@
   "name": "vault-env",
   "displayName": "vault-env",
   "description": "",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spaceOrks/Vault-Env"
+  },
+  "bugs": {
+    "url": "https://github.com/spaceOrks/Vault-Env/issues"
+  },
+  "homepage": "https://github.com/spaceOrks/Vault-Env/#README.md",
+  "publisher": "SpaceOrks",
   "engines": {
-    "vscode": "^1.103.0"
+    "vscode": "^1.90.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onView:VaultParamsView",
+    "onView:VaultSecretsView",
+    "onView:VaultCurrentEnvView"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "vaultEnv.env.edit",
-        "title": "Edir",
+        "command": "vault-env.env.edit",
+        "title": "Edit",
         "icon": "$(edit)"
       },
       {
-        "command": "vaultEnv.configs.addPath",
-        "title": "add path in Vault",
-        "icon": "$(add)"
-      },
-      {
-        "command": "vaultEnv.servers.addServer",
+        "command": "vault-env.servers.addServer",
         "title": "Add server",
         "icon": "$(add)"
       },
       {
-        "command": "vaultEnv.servers.removeServer",
+        "command": "vault-env.servers.removeServer",
         "title": "Remove server",
         "icon": "$(trash)"
       },
       {
-        "command": "vaultEnv.servers.changeName",
+        "command": "vault-env.servers.changeName",
         "title": "Change server's name",
         "icon": "$(refresh)"
       },
       {
-        "command": "vaultEnv.servers.changeStorage",
+        "command": "vault-env.servers.changeStorage",
         "title": "Change vault's storage",
         "icon": "$(refresh)"
       },
       {
-        "command": "vaultEnv.servers.changeUrl",
+        "command": "vault-env.servers.changeUrl",
         "title": "Change server's url",
         "icon": "$(server)"
       },
       {
-        "command": "vaultEnv.servers.changeToken",
+        "command": "vault-env.servers.changeToken",
         "title": "Change token",
         "icon": "$(gist-secret)"
       },
       {
-        "command": "vaultEnv.servers.changeIgnoreSsl",
+        "command": "vault-env.servers.changeIgnoreSsl",
         "title": "Change ssl",
         "icon": ""
       },
       {
-        "command": "vaultEnv.configs.removePath",
-        "title": "Remove path",
-        "icon": "$(trash)"
-      },
-      {
-        "command": "vaultEnv.configs.loadSecret",
+        "command": "vault-env.configs.loadSecret",
         "title": "launch Vault Env ext"
       },
       {
-        "command": "vaultEnv.servers.listConfigs",
+        "command": "vault-env.servers.listConfigs",
         "title": "List allowed configs"
       }
     ],
@@ -100,29 +103,29 @@
     "menus": {
       "view/title": [
         {
-          "command": "vaultEnv.configs.addPath",
+          "command": "vault-env.configs.addPath",
           "when": "view == vaultSecretsView",
           "group": "navigation"
         },
         {
-          "command": "vaultEnv.servers.addServer",
+          "command": "vault-env.servers.addServer",
           "when": "view == vaultParamsView",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "vaultEnv.configs.removePath",
+          "command": "vault-env.configs.removePath",
           "when": "viewItem == 'VaultItem'",
           "group": "inline"
         },
         {
-          "command": "vaultEnv.servers.removeServer",
+          "command": "vault-env.servers.removeServer",
           "when": "viewItem == 'ParamItem'",
           "group": "inline"
         },
         {
-          "command": "vaultEnv.env.edit",
+          "command": "vault-env.env.edit",
           "when": "viewItem == 'vaultEnvItem'",
           "group": "inline"
         }
@@ -138,16 +141,18 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.55.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
+    "@types/node-fetch": "^2.6.13",
+    "@types/vscode": "^1.55.0",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
-    "eslint": "^9.32.0",
-    "typescript": "^5.9.2",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
-    "@types/node-fetch": "^2.6.13",
-    "node-fetch": "^2.7.0"
+    "eslint": "^9.32.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
   }
 }
