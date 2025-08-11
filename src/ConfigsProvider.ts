@@ -4,7 +4,7 @@ import fetch, { RequestInit } from 'node-fetch';
 import * as https from 'https';
 import * as crypto from 'crypto';
 
-import { VaultAPI } from './api/vault_api';
+import { listAllSecretsRecursive, VaultAPI } from './api/vault_api';
 
 const currentSecretsKey = 'currentSecrets';
 const tokenKey = 'vault-env-token';
@@ -57,11 +57,16 @@ export class ConfigsProvider implements vscode.TreeDataProvider<ConfigItem> {
         this._onDidChangeTreeData.fire(undefined);
         await this.context.globalState.update('vaultPaths', this.items);
     }
+    async clearPaths() {
+        this.items = [];
+        this._onDidChangeTreeData.fire(undefined);
+        await this.context.globalState.update('vaultPaths', this.items);
+    }
     async listConfigs(url: string, token: string, ignoreSsl: boolean) {
         const vault_api = await new VaultAPI(url, token, ignoreSsl);
         const list = await vault_api.getList("configs");
+        return list;
         console.log("list:", list);
-        
     }
 }
 

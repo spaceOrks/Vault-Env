@@ -53,11 +53,11 @@ export class VaultAPI{
         const secrets = data.data?.data || data.data;
         return secrets;        
     }
-    async getList(secretPath: string): Promise<string[]> {
+    async getList(secretPath: string, subfolder: string = ""): Promise<string[]> {
         if (secretPath.endsWith('/')) {
             secretPath = secretPath.slice(0, -1);
         }
-        const path = `/v1/${secretPath}/metadata/?list=true`;
+        const path = `/v1/${secretPath}/metadata/${subfolder}?list=true`;
         
         const data = await this.getRequest("LIST", path);
         if (!data) {
@@ -65,19 +65,58 @@ export class VaultAPI{
         }
         let folders: string[] = [];
         // @ts-ignore
-        data.data.keys.forEach(async (element: string) => {
+        for (const element of data.data.keys) {
             if (element.endsWith('/')) {
-                if (!secretPath.endsWith('/')) {
-                    secretPath += '/';
-                }
-                const tmp = await this.getList(secretPath + element);
+                // if (!secretPath.endsWith('/')) {
+                //     secretPath += '/';
+                // }
+                const tmp = await this.getList(secretPath, subfolder + element);
                 if (tmp) {
                     folders = [...new Set([...folders, ...tmp])];
                 }
             } else {
-                folders.push(element);
+                folders.push(`${secretPath}/data/${subfolder}${element}`);
             }
-        });
+        }
         return folders;        
     }
+}
+
+
+
+export async function listAllSecretsRecursive(
+  baseUrl: string,
+  token: string,
+  path: string = 'secret/metadata/'
+): Promise<string[]> {
+  const secrets: string[] = [];
+
+  async function walk(currentPath: string) {
+    const url = `${baseUrl}/v1/${currentPath}?list=true`;
+    const res = await fetch(url, {
+      method: 'LIST',
+      headers: {
+        'X-Vault-Token': token,
+      },
+    });
+
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (!data.data || !data.data.keys) return;
+
+    for (const key of data.data.keys) {
+      if (key.endsWith('/')) {
+        await walk(currentPath + key);
+      } else {
+        secrets.push(currentPath.replace('metadata/', 'data/') + key);
+      }
+    }
+  }
+    if (!res.ok) {
+      console.error(`Failed to fetch secrets: HTTP ${res.status} - ${res.statusText}`);
+      return;
+    }
+  await walk(path);
+  return secrets;
 }

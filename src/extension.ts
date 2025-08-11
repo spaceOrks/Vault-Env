@@ -29,8 +29,11 @@ export function activate(context: vscode.ExtensionContext) {
             configProvider.setSelected(item.name);
             const config = await configProvider.getConfig();
             console.log("config: ", config);
-            await provider.listConfigs(config.url, config.token, config.ignoreSsl);
-
+            provider.clearPaths();
+            const confList = await provider.listConfigs(config.url, config.token, config.ignoreSsl);
+            for (const path of confList) {
+                await provider.addPath(path);
+            }
             // vscode.window.showInformationMessage(`Loading secret at: ${item.label}`);
             // const config = await configProvider.getConfig();
             
