@@ -1,51 +1,51 @@
 # Vault Env VS Code Extension
 
-Vault Env — это расширение для Visual Studio Code, позволяющее безопасно получать, просматривать и использовать секреты из HashiCorp Vault прямо в редакторе. Поддерживает работу с KV secrets engine (v2), вложенные папки, просмотр и копирование переменных окружения.
+Vault Env is a Visual Studio Code extension that allows you to securely fetch, view, and use secrets from HashiCorp Vault directly in the editor. It supports the KV secrets engine (v2), nested folders, and viewing/copying environment variables.
 
-## Возможности
-- Получение списка всех секретов и переменных из Vault
-- Рекурсивный обход вложенных папок с секретами
-- Просмотр и копирование значений секретов
-- Быстрое добавление переменных в окружение проекта
-- Поддержка нескольких Vault-инстансов и путей
+## Features
+- Fetch a list of all secrets and variables from Vault
+- Recursively browse nested secret folders
+- View and copy secret values
+- Quickly add variables to your project environment
+- Support for multiple Vault instances and paths
 
-## Установка
-1. Откройте Visual Studio Code
-2. Перейдите в Extensions (Ctrl+Shift+X)
-3. Найдите "Vault Env" и установите расширение
-4. Перезапустите VS Code при необходимости
+## Installation
+1. Open Visual Studio Code
+2. Go to Extensions (Ctrl+Shift+X)
+3. Search for "Vault Env" and install the extension
+4. Restart VS Code if necessary
 
-## Быстрый старт
-Откройте вкладку расширения:
-![список серверов](images/servers.png)
+## Quick Start
+Open the extension tab:
+![servers list](images/servers.png)
 
-Для добавления нового сервера нажмите + справа от servers.
-Во всплывающем окне укажите новое название для сервера - оно должно быть уникально.
-далее разверните настройки сервера, появятся строки:
-- name: название сервера
-- url: адрес сервера
-- ignoreSsl: игнорировать ошибки сертификатов
-- token: исполььзуемый токен Vault
-- storage: название используемого хранилища секретов
-При нажатии на каждый параметр его можно изменить.
+To add a new server, click the + button to the right of servers.
+In the popup, enter a unique name for the server.
+Then expand the server settings; you will see the following fields:
+- name: server name
+- url: server address
+- ignoreSsl: ignore certificate errors
+- token: Vault token to use
+- storage: name of the secret storage engine
+Click any parameter to edit it.
 
-После настройки подключения к серверу нажмите по корневому элементу сервера, это действие загрузит из vault список всех доступных вам секретов:
+After configuring the server connection, click the root element of the server to load the list of all secrets available to you from Vault:
 
-![список доступных конфигов](images/configs.png)
+![available configs list](images/configs.png)
 
-Кликнув по секрету вы укажете vscode, чтобы он загрузил его в переменные окружения для всех новых терминалов.
+Clicking a secret will instruct VS Code to load it into the environment variables for all new terminals.
 
-Вкладка env показывает загруженные переменные окружения:
+The env tab shows the loaded environment variables:
 
-![перечисления переменных окружения](images/env.png)
+![environment variables list](images/env.png)
 
-## Требования
-- Доступ к HashiCorp Vault (v1.0+)
-- Разрешения на чтение секретов (READ, LIST)
+## Requirements
+- Access to HashiCorp Vault (v1.0+)
+- Permissions to read secrets (READ, LIST)
 
-## Вклад
-Pull requests и предложения приветствуются! Откройте issue для багов или идей.
+## Contribution
+Pull requests and suggestions are welcome! Open an issue for bugs or ideas.
 
-## Лицензия
+## License
 MIT License
 
