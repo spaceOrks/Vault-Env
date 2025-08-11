@@ -4,7 +4,7 @@ import fetch, { RequestInit } from 'node-fetch';
 import * as https from 'https';
 import * as crypto from 'crypto';
 
-import { listAllSecretsRecursive, VaultAPI } from './api/vault_api';
+import { VaultAPI } from './api/vault_api';
 
 const currentSecretsKey = 'currentSecrets';
 const tokenKey = 'vault-env-token';
@@ -31,7 +31,8 @@ export class ConfigsProvider implements vscode.TreeDataProvider<ConfigItem> {
     readonly onDidChangeTreeData: vscode.Event<ConfigItem | undefined | null> = this._onDidChangeTreeData.event;
     public items: string[];
     constructor(private context: vscode.ExtensionContext){
-        this.items = context.globalState.get<string[]>('vaultPaths') || [];
+        // this.items = context.globalState.get<string[]>('vaultPaths') || [];
+        this.items = [];
         
     }
     getTreeItem(element: ConfigItem): vscode.TreeItem {
@@ -50,21 +51,21 @@ export class ConfigsProvider implements vscode.TreeDataProvider<ConfigItem> {
         const newItem = new ConfigItem(path, vscode.TreeItemCollapsibleState.None, path);
         this.items.push(path);
         this._onDidChangeTreeData.fire(undefined);
-        await this.context.globalState.update('vaultPaths', this.items);
+        // await this.context.globalState.update('vaultPaths', this.items);
     }
     async removePath(path: string) {
         this.items = this.items.filter(p => p !== path);
         this._onDidChangeTreeData.fire(undefined);
-        await this.context.globalState.update('vaultPaths', this.items);
+        // await this.context.globalState.update('vaultPaths', this.items);
     }
     async clearPaths() {
         this.items = [];
         this._onDidChangeTreeData.fire(undefined);
-        await this.context.globalState.update('vaultPaths', this.items);
+        // await this.context.globalState.update('vaultPaths', this.items);
     }
-    async listConfigs(url: string, token: string, ignoreSsl: boolean) {
+    async listConfigs(url: string, token: string, ignoreSsl: boolean, storage: string): Promise<string[]> {
         const vault_api = await new VaultAPI(url, token, ignoreSsl);
-        const list = await vault_api.getList("configs");
+        const list = await vault_api.getList(storage);
         return list;
         console.log("list:", list);
     }

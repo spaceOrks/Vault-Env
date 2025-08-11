@@ -30,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
             const config = await configProvider.getConfig();
             console.log("config: ", config);
             provider.clearPaths();
-            const confList = await provider.listConfigs(config.url, config.token, config.ignoreSsl);
+            const confList = await provider.listConfigs(config.url, config.token, config.ignoreSsl, config.storage);
             for (const path of confList) {
                 await provider.addPath(path);
             }
@@ -77,14 +77,20 @@ export function activate(context: vscode.ExtensionContext) {
                 await configProvider.removeServer(item.name);
             }
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeUrl', async (server: ParamItem) => {
-            await configProvider.saveNewUrl(server.name);
+        vscode.commands.registerCommand('vaultEnv.servers.changeUrl', async (server_name: string) => {
+            await configProvider.saveNewUrl(server_name);
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeName', async (server: ParamItem) => {
-            await configProvider.saveNewName(server.name);
+        vscode.commands.registerCommand('vaultEnv.servers.changeName', async (server_name: string) => {
+            await configProvider.saveNewName(server_name);
         }),
-        vscode.commands.registerCommand('vaultEnv.servers.changeToken', async (server: ParamItem) => {
-            await configProvider.saveNewPassword(server.name);
+        vscode.commands.registerCommand('vaultEnv.servers.changeStorage', async (server_name: string) => {
+            await configProvider.saveNewStorage(server_name);
+        }),
+        vscode.commands.registerCommand('vaultEnv.servers.changeToken', async (server_name: string) => {
+            await configProvider.saveNewPassword(server_name);
+        }),
+        vscode.commands.registerCommand('vaultEnv.servers.changeIgnoreSsl', async (server_name: string) => {
+            await configProvider.saveNewSsl(server_name);
         }),
         
         // -------------------------------- vaultEnv.configs ---------------------------

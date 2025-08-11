@@ -35,7 +35,12 @@
       },
       {
         "command": "vaultEnv.servers.changeName",
-        "title": "Изменить название",
+        "title": "Change server's name",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "vaultEnv.servers.changeStorage",
+        "title": "Change vault's storage",
         "icon": "$(refresh)"
       },
       {
@@ -49,8 +54,13 @@
         "icon": "$(gist-secret)"
       },
       {
+        "command": "vaultEnv.servers.changeIgnoreSsl",
+        "title": "Change ssl",
+        "icon": ""
+      },
+      {
         "command": "vaultEnv.configs.removePath",
-        "title": "Удалить путь",
+        "title": "Remove path",
         "icon": "$(trash)"
       },
       {
@@ -108,21 +118,6 @@
         },
         {
           "command": "vaultEnv.servers.removeServer",
-          "when": "viewItem == 'ParamItem'",
-          "group": "inline"
-        },
-        {
-          "command": "vaultEnv.servers.changeUrl",
-          "when": "viewItem == 'ParamItem'",
-          "group": "inline"
-        },
-        {
-          "command": "vaultEnv.servers.changeName",
-          "when": "viewItem == 'ParamItem'",
-          "group": "inline"
-        },
-        {
-          "command": "vaultEnv.servers.changeToken",
           "when": "viewItem == 'ParamItem'",
           "group": "inline"
         },

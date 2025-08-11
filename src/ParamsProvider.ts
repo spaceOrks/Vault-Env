@@ -9,13 +9,57 @@ const VAULT_SERVERS_KEY = 'vaultServers';
 const tokenKey = 'vaultServersSecrets';
 
 
+export class ParamLeafItem extends vscode.TreeItem {
+  constructor(
+    public readonly name: string,
+    public readonly server_name: string,
+    public readonly type?: 'url' | 'token' | 'ignoreSsl' | "name" | "storage",
+  ) {
+    super(`${type}: ${name}`, vscode.TreeItemCollapsibleState.None);
+    if (type === 'url') {
+        this.command = {
+        command: 'vaultEnv.servers.changeUrl',
+        title: "Change server's url",
+        arguments: [server_name]
+        };
+    } else if (type === 'token') {
+        this.command = {
+        command: 'vaultEnv.servers.changeToken',
+        title: "Change server's token",
+        arguments: [server_name]
+        };
+    } else if (type === 'ignoreSsl') {
+        this.command = {
+        command: 'vaultEnv.servers.changeIgnoreSsl',
+        title: "Change server's ignoreSsl",     
+        arguments: [server_name]
+        };
+    } else if (type === 'name') {
+        this.command = {
+        command: 'vaultEnv.servers.changeName',
+        title: "Change server's name",
+        arguments: [server_name]
+        };
+    } else if (type === 'storage') {
+        this.command = {
+        command: 'vaultEnv.servers.changeStorage',
+        title: "Change vault's storage",
+        arguments: [server_name]
+        };
+    }
+    // this.contextValue = 'ParamItem' + type;
+    
+    // this.iconPath = {'id': 'globe'};
+  }
+}
 
 export class ParamItem extends vscode.TreeItem {
   constructor(
     public readonly name: string,
-    public readonly url?: string
+    public readonly url?: string,
+    public readonly children?: ParamLeafItem[]
   ) {
-    super(name + ` (${url})`, vscode.TreeItemCollapsibleState.None);
+    super(name + ` (${url})`, vscode.TreeItemCollapsibleState.Collapsed);
     this.command = {
       command: 'vaultEnv.servers.listConfigs',
       title: 'List allowed configs',
@@ -29,7 +73,7 @@ export class ParamItem extends vscode.TreeItem {
 export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<ParamItem | undefined | null> = new vscode.EventEmitter();
     readonly onDidChangeTreeData: vscode.Event<ParamItem | undefined | null> = this._onDidChangeTreeData.event;
-    public items: {"name": string, "url"?: string, "ignoreSsl"?: boolean}[];
+    public items: {"name": string, "url"?: string, "ignoreSsl"?: boolean, "storage"?: string}[];
     public selectedConfig: string;
 
     // private _onDidChangeTreeData: vscode.EventEmitter<void> = new vscode.EventEmitter();
@@ -43,12 +87,21 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
     getTreeItem(element: ParamItem): ParamItem {
         return element;
     }
-    getChildren(): vscode.ProviderResult<ParamItem[]> {
-        const elems: ParamItem[] = [];
-        this.items.forEach(elem => {
-            elems.push(new ParamItem(elem.name, elem.url));
-        });
-        return elems;
+    getChildren(element?: ParamItem): vscode.ProviderResult<ParamItem[]> {
+        if (!element) {
+            const elems: ParamItem[] = [];
+            this.items.forEach(elem => {
+                elems.push(new ParamItem(elem.name, elem.url, [
+                    new ParamLeafItem(elem.name, elem.name, 'name'),
+                    new ParamLeafItem(elem.url || '', elem.name, 'url'),
+                    new ParamLeafItem(elem.ignoreSsl ? 'true' : 'false', elem.name, 'ignoreSsl'),
+                    new ParamLeafItem('***', elem.name, 'token'),
+                    new ParamLeafItem(elem.storage || '', elem.name, 'storage')
+                ]));
+            });
+            return elems;
+        }
+        return element.children || [];
     }
     refresh() {
         this._onDidChangeTreeData.fire(undefined);
@@ -93,7 +146,7 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
         console.log('server_name:', server_name);
         const server = this._getServer(server_name);
         let url = await vscode.window.showInputBox({
-            placeHolder: `Введите адрес Vault (например: ${server?.url || 'https://vault.local:8765'})`
+            placeHolder: `Input Vault's url (example: ${server?.url || 'https://vault.local:8765'})`
         });
         console.log(`new url[${server_name}]: ${url}`);
         if (url === undefined){
@@ -106,7 +159,7 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
         console.log('server_name:', server_name);
         const server = this._getServer(server_name);
         let new_name = await vscode.window.showInputBox({
-            placeHolder: `Введите новое название (например: ${server?.name || 'Test server'})`
+            placeHolder: `Input new server's name (example: ${server?.name || 'Test server'})`
         });
         console.log(`new url[${server_name}]: ${new_name}`);
         if (new_name === undefined){
@@ -115,15 +168,37 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
         this._updateServer(server_name, new_name);
         return new_name;
     } 
+    async saveNewStorage(server_name: string) {
+        const server = this._getServer(server_name);
+        let new_name = await vscode.window.showInputBox({
+            placeHolder: `Input storage's name (example: ${server?.name || 'Test server'})`
+        });
+        if (new_name === undefined){
+            return;
+        }
+        this._updateServer(server_name, undefined, undefined, undefined, new_name);
+        return new_name;
+    } 
     async saveNewPassword(server_name: string) {
         // @ts-ignore
         let token = await vscode.window.showInputBox({
-            placeHolder: `Введите новый токен для ${server_name}`
+            placeHolder: `Input new token for ${server_name}`
         });
         if(token !== undefined){
             this._updateServerPassword(server_name, token);
         }
         return token;
+    }
+    async saveNewSsl(server_name: string) {
+        // @ts-ignore
+        let answer = await vscode.window.showQuickPick(["Yes", "No"], {
+            placeHolder: `Ignore SSL errors for ${server_name}?`
+        });
+        if(answer !== undefined){
+            const ignoreSsl = answer === "Yes";
+            this._updateServer(server_name, undefined, undefined, ignoreSsl);
+        }
+        return answer;
     }
     private async _updateServerPassword(server_name: string, token: string) {
         // @ts-ignore
@@ -171,10 +246,11 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
             // @ts-ignore
             token: await token as string,
             ignoreSsl: config.ignoreSsl ?? true,
+            storage: config.storage || 'configs'
         };
     }
     private _getServers() {
-        return this.context.globalState.get<{"name": string, "url"?: string, "ignoreSsl"?: boolean}[]>(VAULT_SERVERS_KEY) || [];
+        return this.context.globalState.get<{"name": string, "url"?: string, "ignoreSsl"?: boolean, "storage"?: string}[]>(VAULT_SERVERS_KEY) || [];
     }
     private _getServer(server_name: string) {
         const servers = this.items;
@@ -185,10 +261,10 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
         }
         return undefined;
     }
-    private _updateServer(server_name: string, new_name?: string, new_url?: string, ignoreSsl?: boolean) {
+    private _updateServer(server_name: string, new_name?: string, new_url?: string, ignoreSsl?: boolean, storage?: string) {
         const servers = this.items;
         let index = 0;
-        console.log(`_updateServer: server_name: ${server_name}, new_name: ${new_name}, new_url: ${new_url}, length: ${servers.length}`);
+        console.log(`_updateServer: server_name: ${server_name}, new_name: ${new_name}, new_url: ${new_url}, storage: ${storage}`);
         for (; index < servers.length; index++) {
             console.log(`server: name: ${servers[index].name}, url: ${servers[index].url}`);
             if (servers[index].name === server_name) {
@@ -198,13 +274,21 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
                 if (new_url !== undefined) {
                     servers[index].url = new_url;
                 }
+                if (ignoreSsl !== undefined) {
+                    servers[index].ignoreSsl = ignoreSsl;
+                }
+                if (storage !== undefined) {
+                    servers[index].storage = storage;
+                }
                 break;
             }
         }
         if (index === servers.length && new_name !== undefined) {
             servers.push({
                 "name": new_name,
-                "url": new_url
+                "url": new_url,
+                "ignoreSsl": ignoreSsl,
+                "storage": storage
             });
         }
         this._updateServers();
