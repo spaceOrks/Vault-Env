@@ -46,6 +46,19 @@ The env tab shows the loaded environment variables:
 ## Contribution
 Pull requests and suggestions are welcome! Open an issue for bugs or ideas.
 
+## Version History
+
+### 0.0.2
+- Improved secret browsing and nested folder support
+- Added environment variable view and copy features
+- Enhanced server configuration UI
+- fix bug with module's importe
+
+### 0.0.1
+- Initial release
+- Basic Vault connection and secret listing
+- Support for multiple servers
+
 ## License
 MIT License
 
