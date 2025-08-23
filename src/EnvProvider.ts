@@ -12,13 +12,15 @@ export class EnvItem extends vscode.TreeItem {
   constructor(
     public readonly key: string,
     public readonly value: string,
+    public readonly showEnv: boolean,    
     public readonly collapsibleState: vscode.TreeItemCollapsibleState,
   ) {
-    super(`${key}: ${value}`, collapsibleState);
+    const text = showEnv ? value : '********';
+    super(`${key}: ${text}`, collapsibleState);
     this.command = {
       command: 'vault-env.env.copyEnv',
       title: 'vault-env.env.copyEnv',
-      arguments: [this.value]
+      arguments: [this]
     };
     this.contextValue = 'vaultEnvItem';
   }
@@ -26,6 +28,7 @@ export class EnvItem extends vscode.TreeItem {
 export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<EnvItem | undefined | null> = new vscode.EventEmitter();
     readonly onDidChangeTreeData: vscode.Event<EnvItem | undefined | null> = this._onDidChangeTreeData.event;
+    private _showEnv = false;
     constructor(private context: vscode.ExtensionContext){
     }
     async getEnv(path: string, config: {url: string, token: string, ignoreSsl: boolean}){
@@ -33,7 +36,7 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
         
         if (!secretPath){
             secretPath = await vscode.window.showInputBox({
-                placeHolder: 'Введите путь Vault (например: secret/data/app/db)'
+                placeHolder: 'Enter the Vault path (eg: secret/data/app/db)'
             }) || "";
         }
         
@@ -42,7 +45,7 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
         return null;
         }
         if (!secretPath) {
-        vscode.window.showErrorMessage('Не указан путь до конфигурации');
+        vscode.window.showErrorMessage('Path to configuration not specified');
         return null;
         }
 
@@ -51,7 +54,7 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
             const secrets = vault_api.getSecret(secretPath);
             
             if (!secrets) {
-                vscode.window.showErrorMessage(`Получена пустая конфигурация`);
+                vscode.window.showErrorMessage(`Empty configuration received`);
                 return {};
             }
             return secrets;
@@ -69,13 +72,22 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
             const currentSecrets = this.getEnvs();
             const treeItems: EnvItem[] = [];
             for (const [key, value] of Object.entries(currentSecrets)) {
-                treeItems.push(new EnvItem(key, value as string, vscode.TreeItemCollapsibleState.None));
+                treeItems.push(new EnvItem(key, value as string, this._showEnv, vscode.TreeItemCollapsibleState.None));
             }
         return Promise.resolve(treeItems);
         }
         return Promise.resolve([]);
     }
-    
+    showEnv() {
+        this._showEnv = true;
+        vscode.commands.executeCommand("setContext", "vaultEnvVisible", true);
+        this.refresh();
+    }
+    hideEnv() {
+        this._showEnv = false;
+        vscode.commands.executeCommand("setContext", "vaultEnvVisible", false);
+        this.refresh();
+    }
     getEnvs() {
         const envCollection = this.context.environmentVariableCollection;
         const configs: {[key: string]: unknown} = {};
@@ -100,9 +112,9 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
             for (const [key, value] of Object.entries(newSecrets)) {
                 envCollection.replace(key, value as string);
             }
-            vscode.window.showInformationMessage('Конфигурация загружена!');
+            vscode.window.showInformationMessage('Configuration loaded!');
         } else {
-            vscode.window.showInformationMessage('нет конфигурации по пути!');
+            vscode.window.showInformationMessage('No configuration on the way!');
         }
     }
     saveEnv(key: string, value: string) {

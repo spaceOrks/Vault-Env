@@ -9,6 +9,7 @@ import {ConfigsProvider, ConfigItem} from './ConfigsProvider';
 export function deactivate() {}
 
 export function activate(context: vscode.ExtensionContext) {
+    vscode.commands.executeCommand("setContext", "vaultEnvVisible", false);
     const configProvider = new ParamsProvider(context);
     vscode.window.registerTreeDataProvider('vaultParamsView', configProvider);
     const provider = new ConfigsProvider(context);
@@ -118,8 +119,15 @@ export function activate(context: vscode.ExtensionContext) {
             console.log("item.key:", item.key);
             currentEvnProvider.changeEnv(item.key);
         }),
-        vscode.commands.registerCommand('vault-env.env.copyEnv', async (text: string) => {
-            await vscode.env.clipboard.writeText(text);
+        vscode.commands.registerCommand('vault-env.env.show', async () => {
+            currentEvnProvider.showEnv();
+        }),
+        vscode.commands.registerCommand('vault-env.env.hide', async () => {
+            currentEvnProvider.hideEnv();
+        }),
+        vscode.commands.registerCommand('vault-env.env.copyEnv', async (item: EnvItem) => {
+            await vscode.env.clipboard.writeText(item.value);
+            vscode.window.showInformationMessage(`Copy variable: ${item.key}`);
         })
     );
 } 

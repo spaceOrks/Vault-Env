@@ -2,7 +2,7 @@
   "name": "vault-env",
   "displayName": "vault-env",
   "description": "",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/spaceOrks/Vault-Env"
@@ -26,6 +26,16 @@
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
+      {
+        "command": "vault-env.env.show",
+        "title": "Show",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "vault-env.env.hide",
+        "title": "Hide",
+        "icon": "$(eye-closed)"
+      },
       {
         "command": "vault-env.env.edit",
         "title": "Edit",
@@ -110,6 +120,16 @@
         {
           "command": "vault-env.servers.addServer",
           "when": "view == vaultParamsView",
+          "group": "navigation"
+        },
+        {
+          "command": "vault-env.env.show",
+          "when": "view == vaultCurrentEnvView && vaultEnvVisible == false",
+          "group": "navigation"
+        },
+        {
+          "command": "vault-env.env.hide",
+          "when": "view == vaultCurrentEnvView && vaultEnvVisible == true",
           "group": "navigation"
         },
         {
