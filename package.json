@@ -73,6 +73,11 @@
       {
         "command": "vault-env.servers.listConfigs",
         "title": "List allowed configs"
+      },
+      {
+        "command": "vault-env.env.closeCurrentEnv",
+        "title": "Close env",
+        "icon": "$(clear-all)"
       }
     ],
     "viewsContainers": {
@@ -103,22 +108,17 @@
     "menus": {
       "view/title": [
         {
-          "command": "vault-env.configs.addPath",
-          "when": "view == vaultSecretsView",
+          "command": "vault-env.servers.addServer",
+          "when": "view == vaultParamsView",
           "group": "navigation"
         },
         {
-          "command": "vault-env.servers.addServer",
-          "when": "view == vaultParamsView",
+          "command": "vault-env.env.closeCurrentEnv",
+          "when": "view == vaultCurrentEnvView",
           "group": "navigation"
         }
       ],
       "view/item/context": [
-        {
-          "command": "vault-env.configs.removePath",
-          "when": "viewItem == 'VaultItem'",
-          "group": "inline"
-        },
         {
           "command": "vault-env.servers.removeServer",
           "when": "viewItem == 'ParamItem'",

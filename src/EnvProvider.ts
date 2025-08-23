@@ -77,20 +77,26 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
     }
     
     getEnvs() {
-        const currentSecrets = this.context.workspaceState.get<{[key: string]: unknown}>(currentSecretsKey);
-        return currentSecrets || {};
+        const envCollection = this.context.environmentVariableCollection;
+        const configs: {[key: string]: unknown} = {};
+        envCollection.forEach((key, mutator) => {
+            if (mutator.value !== undefined) {
+                configs[key] = mutator.value;
+            }
+        });
+        return configs;
+    }
+    closeCurrentEnv(){
+        // @ts-ignore
+        const envCollection = this.context.environmentVariableCollection;
+        envCollection.clear();
     }
     saveNewEnvs(newSecrets: Object | null){
         // @ts-ignore
+        this.closeCurrentEnv();
+
         const envCollection = this.context.environmentVariableCollection;
-        const currentSecrets = this.context.workspaceState.get<{[key: string]: unknown}>(currentSecretsKey);
-        if (currentSecrets) {
-            for (const [key, value] of Object.entries(currentSecrets)) {
-                envCollection.delete(key);
-            }
-        }
         if (newSecrets) {
-            this.context.workspaceState.update(currentSecretsKey, newSecrets);
             for (const [key, value] of Object.entries(newSecrets)) {
                 envCollection.replace(key, value as string);
             }
@@ -100,23 +106,18 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
         }
     }
     saveEnv(key: string, value: string) {
-        const currentSecrets = this.context.workspaceState.get<{[key: string]: unknown}>(currentSecretsKey);
-        if (currentSecrets) {
-            currentSecrets[key] = value;
-            this.context.workspaceState.update(currentSecretsKey, currentSecrets);
-        }
         // @ts-ignore
         const envCollection = this.context.environmentVariableCollection;
         envCollection.replace(key, value as string);
         this.refresh();
     }
     async changeEnv(key: string) {
-        let params = this.context.workspaceState.get<{[dict_key: string]: unknown}>(currentSecretsKey);
+        const envCollection = this.context.environmentVariableCollection;
+        let variable: vscode.EnvironmentVariableMutator | undefined = envCollection.get(key);
         let param: string | undefined = undefined;
-        if (params) {
-            param = params[key] as string;
+        if (variable !== undefined) {
+            param = variable.value;
         }
-        
         param = await vscode.window.showInputBox({
             placeHolder: `${param}`
         });

@@ -109,7 +109,10 @@ export function activate(context: vscode.ExtensionContext) {
         }),
         
         // -------------------------------- vault-env.env ---------------------------
-            
+        vscode.commands.registerCommand('vault-env.env.closeCurrentEnv', async () => {
+            currentEvnProvider.closeCurrentEnv();
+            currentEvnProvider.refresh();
+        }),
         vscode.commands.registerCommand('vault-env.env.edit', async (item: EnvItem) => {
             console.log("item:", item);
             console.log("item.key:", item.key);
