@@ -48,6 +48,10 @@ Pull requests and suggestions are welcome! Open an issue for bugs or ideas.
 
 ## Version History
 
+### 0.0.3
+- add show/hide command
+- add close env command
+
 ### 0.0.2
 - Improved secret browsing and nested folder support
 - Added environment variable view and copy features
