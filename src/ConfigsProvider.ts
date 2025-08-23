@@ -63,7 +63,6 @@ export class ConfigsProvider implements vscode.TreeDataProvider<ConfigItem> {
         const vault_api = await new VaultAPI(url, token, ignoreSsl);
         const list = await vault_api.getList(storage);
         return list;
-        console.log("list:", list);
     }
 }
 

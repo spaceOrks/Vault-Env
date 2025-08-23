@@ -25,7 +25,6 @@ export function activate(context: vscode.ExtensionContext) {
             
             configProvider.setSelected(item.name);
             const config = await configProvider.getConfig();
-            console.log("config: ", config);
             provider.clearPaths();
             const confList = await provider.listConfigs(config.url, config.token, config.ignoreSsl, config.storage);
             for (const path of confList) {
@@ -115,8 +114,6 @@ export function activate(context: vscode.ExtensionContext) {
             currentEvnProvider.refresh();
         }),
         vscode.commands.registerCommand('vault-env.env.edit', async (item: EnvItem) => {
-            console.log("item:", item);
-            console.log("item.key:", item.key);
             currentEvnProvider.changeEnv(item.key);
         }),
         vscode.commands.registerCommand('vault-env.env.show', async () => {

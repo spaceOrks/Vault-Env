@@ -139,12 +139,10 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
         return this.selectedConfig = name;
     }
     async saveNewUrl(server_name: string) {
-        console.log('server_name:', server_name);
         const server = this._getServer(server_name);
         let url = await vscode.window.showInputBox({
             placeHolder: `Input Vault's url (example: ${server?.url || 'https://vault.local:8765'})`
         });
-        console.log(`new url[${server_name}]: ${url}`);
         if (url === undefined){
             return;
         }
@@ -152,12 +150,10 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
         return url;
     } 
     async saveNewName(server_name: string) {
-        console.log('server_name:', server_name);
         const server = this._getServer(server_name);
         let new_name = await vscode.window.showInputBox({
             placeHolder: `Input new server's name (example: ${server?.name || 'Test server'})`
         });
-        console.log(`new url[${server_name}]: ${new_name}`);
         if (new_name === undefined){
             return;
         }
@@ -260,9 +256,7 @@ export class ParamsProvider implements vscode.TreeDataProvider<ParamItem> {
     private _updateServer(server_name: string, new_name?: string, new_url?: string, ignoreSsl?: boolean, storage?: string) {
         const servers = this.items;
         let index = 0;
-        console.log(`_updateServer: server_name: ${server_name}, new_name: ${new_name}, new_url: ${new_url}, storage: ${storage}`);
         for (; index < servers.length; index++) {
-            console.log(`server: name: ${servers[index].name}, url: ${servers[index].url}`);
             if (servers[index].name === server_name) {
                 if (new_name !== undefined) {
                     servers[index].name = new_name;
