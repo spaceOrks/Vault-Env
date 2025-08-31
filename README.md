@@ -48,6 +48,10 @@ Pull requests and suggestions are welcome! Open an issue for bugs or ideas.
 
 ## Version History
 
+### 0.0.4
+- add commands to control env (add config, remove config, add env param, remove env param)
+- sync all changes with vault
+
 ### 0.0.3
 - add show/hide command
 - add close env command

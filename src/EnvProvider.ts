@@ -29,13 +29,15 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<EnvItem | undefined | null> = new vscode.EventEmitter();
     readonly onDidChangeTreeData: vscode.Event<EnvItem | undefined | null> = this._onDidChangeTreeData.event;
     private _showEnv = false;
+    private _currentPath = '';
     constructor(private context: vscode.ExtensionContext){
+
     }
-    async getEnv(path: string, config: {url: string, token: string, ignoreSsl: boolean}){
-        let secretPath = path;
+    async getEnv(path: string, config: {url: string, token: string, ignoreSsl: boolean}): Promise<{secrets: {[key: string]: any}, access: string[]} | null>{
+        this._currentPath = path;
         
-        if (!secretPath){
-            secretPath = await vscode.window.showInputBox({
+        if (!this._currentPath){
+            this._currentPath = await vscode.window.showInputBox({
                 placeHolder: 'Enter the Vault path (eg: secret/data/app/db)'
             }) || "";
         }
@@ -44,20 +46,21 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
         vscode.window.showErrorMessage('Vault configuration incomplete. Set vault.url, vault.token in settings.');
         return null;
         }
-        if (!secretPath) {
+        if (!this._currentPath) {
         vscode.window.showErrorMessage('Path to configuration not specified');
         return null;
         }
 
         try {
             const vault_api = await new VaultAPI(config.url, config.token, config.ignoreSsl);
-            const secrets = vault_api.getSecret(secretPath);
+            const secrets = await vault_api.getSecret(this._currentPath);
+            const access = await vault_api.checkAccess([this._currentPath]);
             
             if (!secrets) {
                 vscode.window.showErrorMessage(`Empty configuration received`);
-                return {};
+                return {secrets: {}, access: access[path] || []};
             }
-            return secrets;
+            return {secrets: secrets, access: access[path] || []};
             
         } catch (err: any) {
             vscode.window.showErrorMessage(`Vault fetch failed: ${err.message}`);
@@ -117,13 +120,22 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
             vscode.window.showInformationMessage('No configuration on the way!');
         }
     }
-    saveEnv(key: string, value: string) {
+    async saveEnv(key: string, value: string, config: {url: string, token: string, ignoreSsl: boolean}) {
         // @ts-ignore
         const envCollection = this.context.environmentVariableCollection;
         envCollection.replace(key, value as string);
         this.refresh();
+        if(!this._currentPath) {
+            vscode.window.showErrorMessage('Path to configuration not specified');
+            return;
+        }
+        const data: {[key: string]: any} = {};
+        envCollection.forEach((k, v) => {
+            data[k] = v.value;
+        });
+        await new VaultAPI(config.url, config.token, config.ignoreSsl).updateSecret(this._currentPath, data);
     }
-    async changeEnv(key: string) {
+    async changeEnv(key: string, config: {url: string, token: string, ignoreSsl: boolean}): Promise<string | undefined> {
         const envCollection = this.context.environmentVariableCollection;
         let variable: vscode.EnvironmentVariableMutator | undefined = envCollection.get(key);
         let param: string | undefined = undefined;
@@ -134,8 +146,24 @@ export class EnvProvider implements vscode.TreeDataProvider<EnvItem> {
             placeHolder: `${param}`
         });
         if (param !== undefined) {
-            this.saveEnv(key, param);
+            this.saveEnv(key, param, config);
         }
+        return param;
+    }
+    async removeEnvParam(key: string, config: {url: string, token: string, ignoreSsl: boolean}): Promise<void> {
+        const envCollection = this.context.environmentVariableCollection;
+        let variable: vscode.EnvironmentVariableMutator | undefined = envCollection.get(key);
+        if(variable === undefined) {
+            return;
+        }
+        envCollection.delete(key);
+        this.refresh();
+        const data: {[key: string]: any} = {};
+        envCollection.forEach((k, v) => {
+            data[k] = v.value;
+        });
+        await new VaultAPI(config.url, config.token, config.ignoreSsl).updateSecret(this._currentPath, data);
+        return ;
     }
     refresh(){
         this._onDidChangeTreeData.fire(undefined);

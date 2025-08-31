@@ -2,7 +2,7 @@
   "name": "vault-env",
   "displayName": "vault-env",
   "description": "",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/spaceOrks/Vault-Env"
@@ -42,6 +42,21 @@
         "icon": "$(edit)"
       },
       {
+        "command": "vault-env.env.closeCurrentEnv",
+        "title": "Close env",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "vault-env.env.add",
+        "title": "Add env",
+        "icon": "$(add)"
+      },
+      {
+        "command": "vault-env.env.remove",
+        "title": "Reomve env",
+        "icon": "$(trash)"
+      },
+      {
         "command": "vault-env.servers.addServer",
         "title": "Add server",
         "icon": "$(add)"
@@ -72,6 +87,10 @@
         "icon": "$(gist-secret)"
       },
       {
+        "command": "vault-env.servers.listConfigs",
+        "title": "List allowed configs"
+      },
+      {
         "command": "vault-env.servers.changeIgnoreSsl",
         "title": "Change ssl",
         "icon": ""
@@ -81,13 +100,14 @@
         "title": "launch Vault Env ext"
       },
       {
-        "command": "vault-env.servers.listConfigs",
-        "title": "List allowed configs"
+        "command": "vault-env.configs.add",
+        "title": "Add config",
+        "icon": "$(add)"
       },
       {
-        "command": "vault-env.env.closeCurrentEnv",
-        "title": "Close env",
-        "icon": "$(clear-all)"
+        "command": "vault-env.configs.remove",
+        "title": "Remove",
+        "icon": "$(trash)"
       }
     ],
     "viewsContainers": {
@@ -123,6 +143,16 @@
           "group": "navigation"
         },
         {
+          "command": "vault-env.configs.add",
+          "when": "view == vaultSecretsView",
+          "group": "navigation"
+        },
+        {
+          "command": "vault-env.env.add",
+          "when": "view == vaultCurrentEnvView",
+          "group": "navigation"
+        },
+        {
           "command": "vault-env.env.show",
           "when": "view == vaultCurrentEnvView && vaultEnvVisible == false",
           "group": "navigation"
@@ -145,7 +175,17 @@
           "group": "inline"
         },
         {
+          "command": "vault-env.configs.remove",
+          "when": "viewItem =~ /delete/",
+          "group": "inline"
+        },
+        {
           "command": "vault-env.env.edit",
+          "when": "viewItem == 'vaultEnvItem'",
+          "group": "inline"
+        },
+        {
+          "command": "vault-env.env.remove",
           "when": "viewItem == 'vaultEnvItem'",
           "group": "inline"
         }

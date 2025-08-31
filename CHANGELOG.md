@@ -2,6 +2,12 @@
 
 All notable changes to the "vault-env" extension will be documented in this file.
 
+## [0.0.4] - 2025-08-31
+
+### Added
+- add commands to control env (add config, remove config, add env param, remove env param)
+- sync all changes with vault
+
 ## [0.0.3] - 2025-08-23
 
 ### Added
